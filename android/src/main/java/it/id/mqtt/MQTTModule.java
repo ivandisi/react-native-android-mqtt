@@ -116,7 +116,7 @@ public class MQTTModule extends ReactContextBaseJavaModule implements MqttCallba
   public void connectionLost(Throwable cause) {
     WritableMap params = Arguments.createMap();
     params.putString("connectionLost", cause.getMessage()); 
-    sendEvent("connectionLost", params);
+    sendEvent("mqtt_connectionLost", params);
   }
 
   @Override
