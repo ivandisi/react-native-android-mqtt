@@ -58,7 +58,7 @@ public class MQTTModule extends ReactContextBaseJavaModule implements MqttCallba
   }
 
   @ReactMethod
-  public void connect(final String serverUri, final String clientID, final boolean reconnect, final boolean cleanSession, final Promise promise) {
+  public void connect(final String serverUri, final String clientID, final String username, final String password, final boolean reconnect, final boolean cleanSession, final Promise promise) {
       if (!TextUtils.isEmpty(serverUri) && !TextUtils.isEmpty(clientID)) {
           
         mqttAndroidClient = new MqttAndroidClient(((ReactApplicationContext)context).getApplicationContext(), serverUri, clientID);
@@ -67,6 +67,8 @@ public class MQTTModule extends ReactContextBaseJavaModule implements MqttCallba
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setAutomaticReconnect(reconnect);
         mqttConnectOptions.setCleanSession(cleanSession);
+        mqttConnectOptions.setUserName(username);
+        mqttConnectOptions.setPassword(password.toCharArray());
 
         try {
             mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
