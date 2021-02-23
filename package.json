@@ -1,0 +1,21 @@
+{
+  "name": "react-native-android-mqtt",
+  "version": "1.0.0",
+  "description": "MQTT wrapper for react native.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ivandisi/react-native-netscan-android.git"
+  },
+  "keywords": [
+    "React",
+    "Native",
+    "Android"
+  ],
+  "author": "Ivan Disirò",
+  "license": "Apache License 2.0",
+  "bugs": {
+    "url": "https://github.com/ivandisi/react-native-netscan-android/issues"
+  },
+  "homepage": "https://github.com/ivandisi/react-native-netscan-android"
+}
