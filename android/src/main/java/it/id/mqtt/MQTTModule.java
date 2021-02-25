@@ -86,18 +86,45 @@ public class MQTTModule extends ReactContextBaseJavaModule implements MqttCallba
     
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    promise.resolve("ConnectionError: " + exception.getMessage());
+                    if (exception != null) {
+                        promise.resolve("ConnectionError: " + exception.getMessage());
+                    } else {
+                        promise.resolve("ConnectionError: generic error");
+                    }
                     exception.printStackTrace();
                 }
             });
         } catch (Exception exception) {
-            promise.resolve("ConnectionError: " + exception.getMessage());
+            if (exception != null) {
+                promise.resolve("ConnectionError: " + exception.getMessage());
+            } else {
+                promise.resolve("ConnectionError: generic error");
+            }
             exception.printStackTrace();
         }
 
       } else {
           promise.resolve(null);
       }
+  }
+
+  @ReactMethod
+  public void disconnect(final Promise promise) {
+    if (mqttAndroidClient != null) {
+        try {
+            mqttAndroidClient.disconnect();
+            promise.resolve(true);
+        } catch (Exception exception) {
+            if (exception != null) {
+                promise.resolve("DisconnectionError: " + exception.getMessage());
+            } else {
+                promise.resolve("DisconnectionError: generic error");
+            }
+            exception.printStackTrace();
+        }
+    } else {
+        promise.resolve("Client not created");
+    }
   }
 
   private void sendEvent(String eventName, @Nullable WritableMap params) {
@@ -115,7 +142,11 @@ public class MQTTModule extends ReactContextBaseJavaModule implements MqttCallba
   @Override
   public void connectionLost(Throwable cause) {
     WritableMap params = Arguments.createMap();
-    params.putString("connectionLost", cause.getMessage()); 
+    if (cause !=null) {
+        params.putString("connectionLost", cause.getMessage()); 
+    } else {
+        params.putString("connectionLost", "Connection Lost"); 
+    }
     sendEvent("mqtt_connectionLost", params);
   }
 
@@ -140,48 +171,112 @@ public class MQTTModule extends ReactContextBaseJavaModule implements MqttCallba
 
   @ReactMethod
   public void subscribeTopic(final String topic, final Promise promise) {
-    if (!TextUtils.isEmpty(topic)) {
-        try {
-            mqttAndroidClient.subscribe(topic, 0, null, new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    promise.resolve(true); // TO CHECK, is usefull this token?
-                }
-
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+    if (mqttAndroidClient != null) {
+        if (!TextUtils.isEmpty(topic)) {
+            try {
+                mqttAndroidClient.subscribe(topic, 0, null, new IMqttActionListener() {
+                    @Override
+                    public void onSuccess(IMqttToken asyncActionToken) {
+                        promise.resolve(true); 
+                    }
+    
+                    @Override
+                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                        if (exception != null) {
+                            promise.resolve("SubscribeError: " + exception.getMessage());
+                        } else {
+                            promise.resolve("SubscribeError: generic error");
+                        }
+                    }
+                });
+            } catch (MqttException exception) {
+                if (exception != null) {
                     promise.resolve("SubscribeError: " + exception.getMessage());
+                } else {
+                    promise.resolve("SubscribeError: generic error");
                 }
-            });
-        } catch (MqttException exception) {
-            promise.resolve("SubscribeError: " + exception.getMessage());
-            exception.printStackTrace();
+                exception.printStackTrace();
+            }
+        } else {
+            promise.resolve("Topic is null");
         }
     } else {
-        promise.resolve(null);
+        promise.resolve("Client not created");
+    }
+  }
+
+  @ReactMethod
+  public void isConnected(final Promise promise) {
+    if (mqttAndroidClient != null) {
+        promise.resolve(mqttAndroidClient.isConnected());
+    } else {
+        promise.resolve(false);
+    }
+  }
+
+  @ReactMethod
+  public void unsubscribeTopic(final String topic, final Promise promise) {
+    if (mqttAndroidClient != null) {
+        if (!TextUtils.isEmpty(topic)) {
+            try {
+                mqttAndroidClient.unsubscribe(topic, null, new IMqttActionListener() {
+                    @Override
+                    public void onSuccess(IMqttToken asyncActionToken) {
+                        promise.resolve(true); 
+                    }
+    
+                    @Override
+                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                        if (exception != null) {
+                            promise.resolve("UnsubscribeError: " + exception.getMessage());
+                        } else {
+                            promise.resolve("UnsubscribeError: generic error");
+                        }
+                    }
+                });
+            } catch (MqttException exception) {
+                if (exception != null) {
+                    promise.resolve("UnsubscribeError: " + exception.getMessage());
+                } else {
+                    promise.resolve("UnsubscribeError: generic error");
+                }
+                exception.printStackTrace();
+            }
+        } else {
+            promise.resolve("Topic is null");
+        }
+    } else {
+        promise.resolve("Client not created");
     }
   }
 
   @ReactMethod
   public void sendMessage(final String publishTopic, final String publishMessage, final Promise promise) {
-      if (!TextUtils.isEmpty(publishMessage)) {
-        try {
-            MqttMessage message = new MqttMessage();
-            message.setPayload(publishMessage.getBytes());
-
-            if (!mqttAndroidClient.isConnected()) {
-                promise.resolve("PublishingError: not connected");
-            } else {
-                mqttAndroidClient.publish(publishTopic, message);
-                promise.resolve(true);
+      if (mqttAndroidClient != null) {
+        if (!TextUtils.isEmpty(publishMessage) && !TextUtils.isEmpty(publishTopic)) {
+            try {
+                MqttMessage message = new MqttMessage();
+                message.setPayload(publishMessage.getBytes());
+    
+                if (!mqttAndroidClient.isConnected()) {
+                    promise.resolve("PublishingError: not connected");
+                } else {
+                    mqttAndroidClient.publish(publishTopic, message);
+                    promise.resolve(true);
+                }
+            } catch (MqttException exception) {
+                if (exception != null ) {
+                    promise.resolve("PublishingError: " + exception.getMessage());
+                } else {
+                    promise.resolve("PublishingError: generic error");
+                }
+                exception.printStackTrace();
             }
-        } catch (MqttException exception) {
-            promise.resolve("PublishingError: " + exception.getMessage());
-            
-        }
+          } else {
+              promise.resolve("PublishTopic or PublishMessage is null");
+          }
       } else {
-          promise.resolve(null);
+        promise.resolve("Client not created");
       }
   }
-
 }

@@ -5,7 +5,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ivandisi/react-native-netscan-android.git"
+    "url": "git+https://github.com/ivandisi/react-native-android-mqtt.git"
   },
   "keywords": [
     "React",
@@ -15,7 +15,7 @@
   "author": "Ivan Disirò",
   "license": "Apache License 2.0",
   "bugs": {
-    "url": "https://github.com/ivandisi/react-native-netscan-android/issues"
+    "url": "https://github.com/ivandisi/react-native-android-mqtt/issues"
   },
-  "homepage": "https://github.com/ivandisi/react-native-netscan-android"
+  "homepage": "https://github.com/ivandisi/react-native-android-mqtt"
 }
