@@ -44,12 +44,14 @@ public class MQTTModule extends ReactContextBaseJavaModule implements MqttCallba
 
 
   private MqttAndroidClient mqttAndroidClient;
+  MqttConnectOptions mqttConnectOptions;
   private ReactContext context;
 
 
   public MQTTModule(ReactApplicationContext reactContext) {
       super(reactContext);
       context = reactContext;
+      mqttConnectOptions = new MqttConnectOptions();
   }
 
   @Override
@@ -58,17 +60,28 @@ public class MQTTModule extends ReactContextBaseJavaModule implements MqttCallba
   }
 
   @ReactMethod
-  public void connect(final String serverUri, final String clientID, final String username, final String password, final boolean reconnect, final boolean cleanSession, final Promise promise) {
+  public void setConnectionOptions(final String username, final String password, 
+                                    final boolean autoReconnect, final boolean cleanSession, 
+                                    final int keepAlive, final int maxInFlight, final int connectionTimeout,
+                                    final Promise promise) {
+        mqttConnectOptions = new MqttConnectOptions();
+        mqttConnectOptions.setAutomaticReconnect(autoReconnect);
+        mqttConnectOptions.setCleanSession(cleanSession);
+        mqttConnectOptions.setUserName(username);
+        mqttConnectOptions.setPassword(password.toCharArray());
+        mqttConnectOptions.setKeepAliveInterval(keepAlive);
+        mqttConnectOptions.setMaxInflight(maxInFlight);
+        mqttConnectOptions.setConnectionTimeout(connectionTimeout);
+        promise.resolve(true);
+  }
+
+
+  @ReactMethod
+  public void connect(final String serverUri, final String clientID, final Promise promise) {
       if (!TextUtils.isEmpty(serverUri) && !TextUtils.isEmpty(clientID)) {
           
         mqttAndroidClient = new MqttAndroidClient(((ReactApplicationContext)context).getApplicationContext(), serverUri, clientID);
         mqttAndroidClient.setCallback(this);
-
-        MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
-        mqttConnectOptions.setAutomaticReconnect(reconnect);
-        mqttConnectOptions.setCleanSession(cleanSession);
-        mqttConnectOptions.setUserName(username);
-        mqttConnectOptions.setPassword(password.toCharArray());
 
         try {
             mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
