@@ -13,15 +13,15 @@ import MQTT from 'react-native-android-mqtt';
 
 
 
-
 // Setup Connection
 const result = await MQTT.setConnectionOptions(username, password, autoReconnect, cleanSession, keepAlive, maxInFlight, connectionTimeout);
-
 //Default values are:
 // CLEAN_SESSION_DEFAULT	true
 // CONNECTION_TIMEOUT_DEFAULT	30 (in seconds)
 // KEEP_ALIVE_INTERVAL_DEFAULT 60 (in seconds)
 // MAX_INFLIGHT_DEFAULT	10
+
+
 
 // Start Connection
 const result = await MQTT.connect(serverUri, clientID);
@@ -43,8 +43,6 @@ const result = await MQTT.unsubscribeTopic(topic);
 
 
 
-
-
 // Listen events
 import { DeviceEventEmitter } from 'react-native';
 ...
@@ -54,15 +52,10 @@ function handleDelivery(event) {
 ...
 DeviceEventEmitter.addListener('mqtt_connectionLost', handleDelivery);
 
-
-// Complete connection
-'mqtt_connectComplete'
-// Message arrived
-'mqtt_messageArrived'
-// Delivery completed
-'mqtt_deliveryComplete'
-// Connection lost
-'mqtt_connectionLost'
+// Complete connection: 'mqtt_connectComplete'
+// Message arrived: 'mqtt_messageArrived'
+// Delivery completed: 'mqtt_deliveryComplete'
+// Connection lost: 'mqtt_connectionLost'
 
 ```
 
