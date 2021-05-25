@@ -62,7 +62,7 @@ public class MQTTModule extends ReactContextBaseJavaModule implements MqttCallba
   @ReactMethod
   public void setConnectionOptions(final String username, final String password, 
                                     final boolean autoReconnect, final boolean cleanSession, 
-                                    final int keepAlive, final int maxInFlight, final int connectionTimeout,
+                                    final int keepAlive, final int maxInFlight, final int connectionTimeout, final int MQTTVersion,
                                     final Promise promise) {
         mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setAutomaticReconnect(autoReconnect);
@@ -72,6 +72,7 @@ public class MQTTModule extends ReactContextBaseJavaModule implements MqttCallba
         mqttConnectOptions.setKeepAliveInterval(keepAlive);
         mqttConnectOptions.setMaxInflight(maxInFlight);
         mqttConnectOptions.setConnectionTimeout(connectionTimeout);
+        mqttConnectOptions.setMqttVersion(MQTTVersion);
         promise.resolve(true);
   }
 
